@@ -1,0 +1,37 @@
+version: "2"
+services:
+  node:
+    image: "node:8"
+    user: "node"
+    working_dir: /home/node/app/
+    networks:
+      - net
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./src:/home/node/app
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+    ports:
+      - 3001:3000
+    command: bash -c "npm install && npm start"
+
+  mongodb:
+    image: mangoraft/mongodb-arm
+    container_name: mongodb
+    networks:
+      - net
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017:27017
+    command: mongod --smallfiles --logpath=/dev/null
+
+networks:
+  net:
+    driver: bridge
